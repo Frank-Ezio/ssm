@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xiaoshu.dao.ContentMapper">
+
+  <select id="findSt" resultType="com.xiaoshu.entity.Style">
+  select * from style 
+  </select>
+  
+  <resultMap type="com.xiaoshu.entity.Content" id="all">
+  <id column="id" property="id"/>
+  <result column="styleid" property="styleid"/>
+  <result column="title" property="title"/>
+  <result column="url" property="url"/>
+  <result column="path" property="path"/>
+  <result column="price" property="price"/>
+  <result column="status" property="status"/>
+  <result column="createtime" property="createtime"/>
+  <association property="style" javaType="com.xiaoshu.entity.Style">
+  <id column="styleid" property="styleid"/>
+  <result column="stylename" property="stylename"/>
+  <result column="createtime" property="createtime"/>
+  </association>
+  </resultMap>
+   
+  <select id="findALL" parameterType="com.xiaoshu.entity.Content" resultMap="all">
+  select * from content c,style s
+  <where>
+  c.styleid=s.styleid
+  <if test="title!=null and title!=''">
+  and title like '%${title}%'
+  </if>
+  <if test="styleid!=null and styleid!=''">
+  and c.styleid=#{styleid}
+  </if>
+  </where>
+  </select>
+ 
+  
+  <select id="findByName" parameterType="string" resultType="com.xiaoshu.entity.Content">
+  select * from content where title=#{title}
+  </select>
+  
+  <insert id="add" parameterType="com.xiaoshu.entity.Content">
+  insert into content value (null,#{styleid},#{title},#{url},#{path},#{price},#{status},now())
+  </insert>
+  
+  <delete id="del" parameterType="int">
+  delete from content where id=#{id}
+  </delete>
+  
+  <select id="c" resultType="com.xiaoshu.entity.Count">
+  SELECT stylename n,COUNT(id) c FROM content c,style s WHERE c.styleid=s.styleid GROUP BY stylename
+  </select>
+</mapper>
